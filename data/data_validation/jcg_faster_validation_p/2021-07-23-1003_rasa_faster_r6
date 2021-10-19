@@ -1,0 +1,13 @@
+[Header]
+File opened	2021-07-23 10:03:33
+Console s/n	68C-831503
+Console ver	Bluestem v.1.5.02
+Scripts ver	2021.03  1.5.02, Feb 2021
+Head s/n	68H-581503
+Head ver	1.4.5
+Head cal	{"co2azero": "0.990305", "h2obspanconc1": "12.21", "co2aspan2a": "0.329491", "flowmeterzero": "0.999939", "ssb_ref": "37595.2", "co2aspan2b": "0.327046", "h2oaspan2": "0", "h2oaspanconc1": "12.21", "tbzero": "0.0863571", "h2oazero": "1.00241", "h2obspan2": "0", "h2obspan2b": "0.0691233", "tazero": "-0.00228119", "ssa_ref": "35974.6", "h2obzero": "0.996793", "oxygen": "21", "h2oaspanconc2": "0", "flowbzero": "0.27791", "co2aspanconc2": "296.7", "h2oaspan2b": "0.069198", "h2obspan1": "1.00029", "co2aspanconc1": "2500", "co2bspan2": "-0.0261668", "h2obspan2a": "0.0691036", "h2obspanconc2": "0", "co2aspan1": "1.00108", "flowazero": "0.33694", "co2bspanconc2": "296.7", "co2bspan1": "1.00105", "chamberpressurezero": "2.57817", "co2bspanconc1": "2500", "h2oaspan1": "1.00294", "co2aspan2": "-0.0257965", "co2bzero": "0.957759", "co2bspan2a": "0.328844", "co2bspan2b": "0.32636", "h2oaspan2a": "0.0689952"}
+Chamber type	6800-01A
+Chamber s/n	MPF-651385
+Chamber rev	0
+Chamber cal	0
+Fluorometer	MPF-651385
