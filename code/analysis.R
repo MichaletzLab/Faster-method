@@ -8,9 +8,10 @@ all_files = list.files("data/data_validation", recursive = T, full.names = T) %>
   grep("\\.", ., value = T, invert = T)
 
 # Problem with file 86 - the raw file is bad, but the excel looks ok
-# maybe try downloading it again
-data_raw = lapply(all_files[c(1:85,87:109)], read_6800)
-
+# maybe try downloading it again - now it seems multiple files are bad
+#All the M1 data files 13-32 are bad. WTF? now 43-48 bad
+#data_raw = lapply(all_files[49], read_6800)
+data_raw = lapply(all_files, read_6800)
 
 data_unpack = c()
 for (i in 1:length(data_raw)) {
@@ -89,7 +90,7 @@ library(plantecophys)
 
 extracted = fitacis(data = racir_corr, 
            group = "curveID",
-           id = "filename",
+           id = c("filename", "curveID"),
            varnames = list(ALEAF = "Acor", Tleaf = "Tleaf", Ci = "Cicor", PPFD = "Qin", Rd = "Rd"),
            Tcorrect = F,
            fitmethod = "default")
@@ -97,7 +98,8 @@ extracted = fitacis(data = racir_corr,
 
 kinetics_data = c()
 for (i in 1:length(extracted)) {
-  if(i==32) { next }
+  if(extracted[[i]]$fitmethod == "bilinear") { next }
+  #print(i)
   vcmax = extracted[[i]]$pars[1]
   jmax = extracted[[i]]$pars[2]
   rd = extracted[[i]]$pars[3]
@@ -107,9 +109,11 @@ for (i in 1:length(extracted)) {
                   data.frame(filename, vcmax, jmax, rd, tleaf) )
 }
 
-
-
-
+# pdf("hi.pdf")
+# for(i in 1:length(extracted)) {
+#   plot(extracted[[i]])
+# }
+# dev.off()
 # OK so I've noticed that I'm missing some RASA RACiR curves.... I wonder where they have gone
 
 
@@ -121,4 +125,48 @@ kinetics_data[kinetics_data$filename %>% grep("tito", .),]$taxon = "TITO"
 kinetics_data$replicate = kinetics_data$filename %>% str_match("r[0-9]+") %>% str_extract("[0-9]+")
 
 kinetics_data = kinetics_data %>% select(-filename)
+
+
+source("code/curve_fitting_michaletz_2021.R")
+
+kinetics_data = kinetics_data %>% group_by(taxon, replicate) %>% mutate(curveID = cur_group_id())
+
+vcmax.param = fit_curves_michaletz_2021(kinetics_data, x = "tleaf", y = "vcmax")
+jmax.param = fit_curves_michaletz_2021(kinetics_data, x = "tleaf", y = "jmax")
+# Not all were fit, we may need to do some fiddling
+
+
+# Let's just do curveID = 12 here for one example
+
+R = 8.314 # J/molK
+k = 8.617e-5 #eV/K
+
+#Ed/Topt = dS - Rln[Ea/(Ed-Ea]
+#dS = Ed/Topt + Rln[Ea/(Ed-Ea]
+
+i = 7
+dSC = vcmax.param$E_D[i]*R/k/(vcmax.param$T_opt[i]+273) + R*log(vcmax.param$E[i]/(vcmax.param$E_D[i]-vcmax.param$E[i]))
+dSJ = jmax.param$E_D[i]*R/(jmax.param$T_opt[i]+273)/k + R*log(jmax.param$E[i]/(jmax.param$E_D[i]-jmax.param$E[i]))
+
+
+a = Photosyn(Tleaf = 0:40,
+         Jmax = jmax.param$J_ref[i],
+         Vcmax = vcmax.param$J_ref[i],
+         EaV = vcmax.param$E[i]*R/k,
+         EdVC = vcmax.param$E_D[i]*R/k,
+         delsC = dSC,
+         EaJ = jmax.param$E[i]*R/k,
+         EdVJ = jmax.param$E_D[i]*R/k,
+         delsJ = dSJ)
+
+# R = 8.314 # J/molK
+# k = 8.617e-5 #eV/K
+# vcmax.param$E[i]*R/k
+plot(a$Tleaf, a$ALEAF)
+
+# I need to try to force the curve fitting algorithm to get fits here to as many as possible
+# Missing curve fits to most of them.
+
+# Also need to select a T range (15 - 38 seems consistent with the step method)
+
 
