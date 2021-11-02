@@ -102,8 +102,8 @@ ggplot(data = data.cut, aes(x=Tleaf,y=A,color=method)) +
 ggplot(data = data.cut, aes(x=Tleaf,y=Arel,color=method)) +
   geom_point()
 
-ggplot(data = data.cut.cut, aes(x=Tleaf,y=Arel,color=method)) +
-  geom_point()
+ggplot(data = data.cut.cut, aes(x=Tleaf,y=Arel,color=method, group = curveID)) +
+  geom_line()
 
 # Let's do a sample non-equilibrium correction
 non.eq.AT = subset(data.all$AT_faster, curveID == 24)
