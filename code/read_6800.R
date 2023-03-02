@@ -1,3 +1,4 @@
+# Function to read LI-6800 files
 read_6800 <- function(filename) {
   
   raw_input = readLines(filename)                # Read in raw datafile
