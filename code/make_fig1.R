@@ -2,13 +2,16 @@
 make_fig1 = function(data) {
   
   # Select an exemplary curve
-  curdat = subset(data$AT_faster, rep == 4)[1:750,]
+  curdat = subset(data$AT_faster, rep == 137 & method == "faster") 
+  
+  len = dim(curdat)[1]
+  curdat = curdat[1:len,]
   
   # Make dataframe in nice format for plotting
   plot.df = data.frame(
-    y = c(curdat$Txchg, curdat$Tleaf, 6*(curdat$A-26)),
+    y = c(curdat$Txchg, curdat$Tleaf, 11*(curdat$A-8)),
     x = curdat$elapsed/60,
-    label = c(rep("Txchg", 750), rep("Tleaf", 750), rep("A", 750))
+    label = c(rep("Txchg", len), rep("Tleaf", len), rep("A", len))
   )
   
   # Create color palette
@@ -25,7 +28,7 @@ make_fig1 = function(data) {
     theme(legend.background = element_rect(fill='transparent')) +
     xlab("Time (min)") +
     scale_y_continuous(name = "Temperature (ºC)", 
-                       sec.axis = sec_axis(~./6+26, name = "Assimilation rate (µmol/m²s)")) 
+                       sec.axis = sec_axis(~./10+8, name = "Assimilation rate (µmol/m²s)")) 
 
   # Save plot to file
   svg("figures/fig1.svg", width = 3, height = 2.5)

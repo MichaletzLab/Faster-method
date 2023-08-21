@@ -15,6 +15,9 @@ make_figS1 = function() {
                             data.frame(data_raw[i], curveID = i) %>% select(-averaging))
   }
   data_unpack$curveID = as.factor(data_unpack$curveID)
+  
+  # Only using exchange temperatures below 40 now in main data
+  data_unpack = subset(data_unpack, Txchg <= 40)
  
   # Panel 1 co2 match value
   p1 = ggplot(data_unpack, aes(x=Txchg, y = co2_adj, color = curveID)) +
@@ -30,7 +33,7 @@ make_figS1 = function() {
     geom_point(alpha=0.7) +
     geom_smooth(method="lm",aes(color=NULL), color="black") +
     my_theme +
-    annotate("text", label = "(b)", x = 8,y=0.03) +
+    annotate("text", label = "(b)", x = 8,y=0.02) +
     xlab(NULL) +
     ylab(bquote(H[2]*"O match offset (µmol/mol)"))
   
@@ -52,7 +55,7 @@ make_figS1 = function() {
     geom_point(alpha=0.7) +
     geom_abline(slope = 0, intercept = 0, lty = 2) +
     my_theme +
-    annotate("text", label = "(d)", x = 8,y=0.03) +
+    annotate("text", label = "(d)", x = 8,y=0.02) +
     xlab("Heat exchanger temperature (°C)") +
     ylab(bquote("Residuals (H"[2]*"O) (µmol/mol)"))
   

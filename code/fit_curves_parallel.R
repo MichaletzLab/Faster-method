@@ -1,4 +1,4 @@
-# Function for fitting Pawar 2018 model using parallel processing
+# Function for fitting SS model (pawar_2018) using parallel processing
 fit_curves_parallel = function(dat) {
   
   # Fit curve with NLS multstart

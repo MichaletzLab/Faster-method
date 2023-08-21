@@ -9,13 +9,13 @@ make_fig5 = function(data) {
   pal2 = c("#0072b2", "#E69f00")
   
   # Make panel 1
-  
   ## Grab one faster curve, correct the curve
-  curdat = subset(data$AT_faster, rep == 1) %>% 
-    match_correct() %>% noneq_correct_full(dt1 = 0.99, dt2 = 0.91, aV = 66.65)
-
-  ## Subsample it at different densities, perhaps logarithmically
-  lengths = c(5:25,seq(30,100,5),200,300,400,500,600,749)
+  curdat = subset(data$AT_faster, rep == 141 & method == "faster") %>% 
+    match_correct() %>% 
+    noneq_correct_full(dt1_c = 1.58, dt2_c = 1.21, aV_c = 67.26, dt1_h = 2.23, dt2_h = 2.79, aV_h = 78.55)
+    
+  ## Subsample it at different densities
+  lengths = c(5:25,seq(30,100,5),200,300,400,450)
   
   all.sub=c()
   # When subsmapling, take first and last point, then distribute the rest evenly
@@ -59,19 +59,17 @@ make_fig5 = function(data) {
   results_long = results %>% gather(key = "variable", "SE_pct", r_tref_SE_pct, e_SE_pct, eh_SE_pct, topt_SE_pct)
   
   ## Panel 1: number of points effects on parameter SE
-  bks = c(5,15,50,150,500,750)
+  bks = c(5,15,50,150,450)
   p1 = ggplot(data = results_long, aes(x = curveID, y = 100*SE_pct, color = variable)) +
     geom_line() +
     scale_x_log10(breaks=bks,labels=bks) +
-    scale_color_manual(values=pal1,breaks=c("r_tref_SE_pct", "e_SE_pct", "eh_SE_pct", "topt_SE_pct"),   labels=c(expression(A[10]), expression(E[A]), expression(E[D]), expression(T[opt]))) +
+    scale_color_manual(values=pal1,breaks=c("r_tref_SE_pct", "e_SE_pct", "eh_SE_pct", "topt_SE_pct"),   labels=c(expression(A[max]), expression(E[A]), expression(E[D]), expression(T[opt]))) +
     my_theme +
     theme(legend.position = c(0.8,0.75),
           legend.title = element_blank()) +
     xlab("Measurements per curve") +
     ylab("Parameter estimate standard error (%)") +
-    annotate("text", x = 5, y = 30, label="(a)")
-  
-  
+    annotate("text", x = 5, y = 35, label="(a)")
   
   #
   #
@@ -87,15 +85,16 @@ make_fig5 = function(data) {
   noise.levels = seq(0.001,0.03, 0.001) # SD of gaussian noise
   ntot = nrep*length(noise.levels)
   
+  len = dim(curdat)[1]
   
   # We need to copy each curve a number of times equal to noise levels times nrep
-  faster.curves = faster.curve[rep(1:749,ntot),]
+  faster.curves = faster.curve[rep(1:len,ntot),]
   normal.curves = normal.curve[rep(1:10,ntot),]
   
-  faster.curves$noise.level = rep(noise.levels, each=(nrep*749))
+  faster.curves$noise.level = rep(noise.levels, each=(nrep*len))
   normal.curves$noise.level = rep(noise.levels, each=(nrep*10))
   
-  faster.curves$curveID = rep(1:ntot, each=749)
+  faster.curves$curveID = rep(1:ntot, each=len)
   normal.curves$curveID = rep(1:ntot, each=10)
   
   # Add noise
@@ -166,7 +165,7 @@ make_fig5 = function(data) {
   plot.data.2 = results.plot.data %>% rename(Density = type)
   sd.data.2 = results.sd.data %>% rename(Density = type)
 
- # Panel 2: A_10
+ # Panel 2: A_max
  a = subset(plot.data.2, parameter == "mean_r_tref")
  b = subset(sd.data.2, parameter == "mean_r_tref")
  p2 = ggplot(a, aes(x=100*noise.level, y = 100*value, color = Density)) +
@@ -176,8 +175,9 @@ make_fig5 = function(data) {
    scale_color_manual(values=pal2) +
    scale_fill_manual(values=pal2) +
    xlab(NULL) +
-   ylab(bquote(A[10]~"(% of"~A[max]*")")) +
-   annotate("text", x = 0.2, y = 100*max(b$upper), label="(b)") +
+   ylim(96,103) +
+   ylab(bquote(A[max]~"(%)")) +
+   annotate("text", x = 0.2, y = 103, label="(b)") +
    theme(legend.position = c(0.25,0.25)) +
    theme(legend.background = element_blank(),
          legend.box.background = element_blank(),

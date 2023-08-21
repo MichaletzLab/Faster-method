@@ -2,26 +2,28 @@
 make_fig2 = function(data) {
   
   # Select a representative AT curve
-  curdat = subset(data$AT_faster, rep == 4)#[1:750,]
+  curdat = subset(data$AT_faster, rep == 138 & method == "faster")
+  
+  len = dim(curdat)[1]
   
   # Make DF including just the match test points
   test.points.df = data.frame(
-    Tleaf = curdat$Tleaf[c(1, 751)],
-    CO2_offset = curdat$co2_adj[c(1,751)],
-    H2O_offset = curdat$h2o_adj[c(1,751)],
-    A = curdat$A[c(1, 751)]
+    Tleaf = curdat$Tleaf[c(1, len)],
+    CO2_offset = curdat$co2_adj[c(1,len)],
+    H2O_offset = curdat$h2o_adj[c(1,len)],
+    A = curdat$A[c(1, len)]
   )
   
   # Make DF illustrating match offset interpolation
   match.offset.df = data.frame(
-    Txchg = curdat$Txchg[c(1, 751)],
-    offset = c(curdat$co2_adj[c(1,751)],curdat$h2o_adj[c(1,751)]),
+    Txchg = curdat$Txchg[c(1, len)],
+    offset = c(curdat$co2_adj[c(1,len)],curdat$h2o_adj[c(1,len)]),
     label = c("CO2", "CO2", "H2O", "H2O")
   )
   
   # Make DF illustrating AT curve before and after IRGA correction
   comparison.df = bind_rows(
-    curdat[1:750,] %>% mutate(label = "Uncorrected"),
+    curdat[1:(len-1),] %>% mutate(label = "Uncorrected"),
     curdat %>% match_correct() %>% mutate(label = "Corrected")
   )
   
@@ -29,18 +31,18 @@ make_fig2 = function(data) {
   pal2 = c("#CC79A7", "#009E73")
   
   # Panel 1: illustrate the match test points
-  p1 = ggplot(curdat, aes(x = Tleaf, y = A)) + 
+  p1 = ggplot(curdat[1:(len-1),], aes(x = Tleaf, y = A)) + 
     geom_line(color = pal2[1]) +
     geom_point(data = test.points.df, fill = pal2[1], pch = 21) +
-    annotate("segment", x = 20, xend = 15.5, y = 26.5, yend = 26,
+    annotate("segment", x = 15, xend = 10, y = 7.3, yend = 7,
              size = 1, arrow = arrow(length = unit(.2,"cm"))) +
-    annotate("segment", x = 31, xend = 35, y = 28.7, yend = 29.5,
+    annotate("segment", x = 27, xend = 32, y = 7.9, yend = 7.9,
              size = 1, arrow = arrow(length = unit(.2,"cm"))) +
-    annotate("text", x = 27,y = 26.5,
+    annotate("text", x = 23,y = 7.4,
              size = 4,label = "Initial match point") +
-    annotate("text", x = 24,y = 28.5,
-             size = 4,label = "Final match point") +
-    annotate("text", x = 14, y = 33.5, label="(a)") +
+    annotate("text", x = 19,y = 7.9,
+            size = 4,label = "Final match point") +
+    annotate("text", x = 9, y = 10.5, label="(a)") +
     xlab("Leaf temperature (°C)") +
     ylab("Assimilation rate (µmol/m²s)") +
     my_theme
@@ -52,9 +54,9 @@ make_fig2 = function(data) {
     scale_shape_manual(values = c(19,17), labels = c(expression(CO[2]), expression(H[2]*O))) +
     scale_linetype_manual(values = c(1,2),labels = c(expression(CO[2]), expression(H[2]*O))) +
     my_theme +
-    theme(legend.position = c(0.2,0.2)) +
+    theme(legend.position = c(0.8,0.8)) +
     theme(legend.title = element_blank()) +
-    annotate("text", x = 7, y = 0.27, label="(b)") +
+    annotate("text", x = 4, y = 0.3, label="(b)") +
     xlab("Heat exchanger temperature (°C)") +
     scale_y_continuous(name = bquote(CO[2]~"match offset (µmol/mol)"),
                        sec.axis = sec_axis(~., name = bquote(H[2]*"O match offset (mmol/mol)"))) 
@@ -66,7 +68,7 @@ make_fig2 = function(data) {
     my_theme +
     xlab("Leaf temperature (°C)") +
     ylab("Assimilation rate (µmol/m²s)") +
-    annotate("text", x = 14, y = 34, label="(c)") +
+    annotate("text", x = 9, y = 10.5, label="(c)") +
     theme(legend.position = c(0.7,0.2)) +
     theme(legend.title = element_blank()) +
     theme(legend.background = element_rect(fill='transparent'))

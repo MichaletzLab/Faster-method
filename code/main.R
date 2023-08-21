@@ -1,7 +1,7 @@
 # Script to generate figures and statistics for methods paper describing
 # Fast Assimilation-Temperature Response (FAsTeR) curves.
 
-# Last modified 2 March 2023, Josef Garen
+# Last modified 21 August 2023, Josef Garen
 
 # Load libraries, etc.
 source("code/header.R")
@@ -11,10 +11,10 @@ if(!dir.exists("figures")) { dir.create("figures") }
 if(file.exists("stats.txt")) { file.remove("stats.txt") }
 
 # Load data
-data.all = build.database()
+data.all = build_database()
 
 # Make table
-make_tab1(data.all) # Anova table with parameter estimates
+make_tab1(data.all) # OK - Repeated-measures ANOVA and Tukey test
 
 # Generate figures
 make_fig1(data.all) # Illustration of the method
@@ -27,6 +27,9 @@ make_fig5(data.all) # Effects of noise and data density on parameter estimates
 make_figS1()         # Linearity of match offset accumulation
 make_figS2(data.all) # Raw data
 make_figS3(data.all) # Noise illustration
+
+make_tabS1()         # Ramp speed comparison table
+make_tabS2(data.all) # Stomatal conductance table
 
 #######
 # END #

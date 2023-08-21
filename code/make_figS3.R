@@ -3,10 +3,12 @@ make_figS3 = function(data) {
   
   # Set random number seed
   set.seed(0)
+
+  # Select an AT curve
+  curdat = subset(data$AT_faster, rep == 137 & method == "faster") %>% match_correct() %>% 
+      noneq_correct_full(dt1_c = 1.58, dt2_c = 1.21, aV_c = 67.26, dt1_h = 2.23, dt2_h = 2.79, aV_h = 78.55) %>% 
+      mutate(Condition = "Corrected")
   
-  ## Grab one faster curve, Correct the curve
-  curdat = subset(data$AT_faster, rep == 1) %>% 
-    match_correct() %>% noneq_correct_full(dt1 = 0.99, dt2 = 0.91, aV = 66.65)
   len = dim(curdat)[1]
   
   ## Grab one faster curve and one normal curve

@@ -1,28 +1,38 @@
-make_tab1 = function(data.AT) {
-
+# Supplementary ramp speed table
+make_tabS1 = function() {
   
   # Set random number seed
   set.seed(0)
   
-  # Do nonequilibrium and IRGA corrections
-  faster = data.AT$AT_faster %>% 
-    match_correct() %>% 
-    noneq_correct_full(dt1_c = 1.58, dt2_c = 1.21, aV_c = 67.26, dt1_h = 2.23, dt2_h = 2.79, aV_h = 78.55)
-
-  # Make AT dataframe
-  data.AT = bind_rows(data.AT$AT_step, 
-                      data.AT$AT_chamber, 
-                      faster)
-  data.AT$curveID = data.AT %>%  group_by(rep, method) %>% group_indices()
-  data.AT = data.AT %>% select(curveID, rep, method, A, Tleaf)
+  # Get data
+  all_files = list.files("data/ramp_speed_tests", recursive = T, full.names = T) %>% 
+    grep("\\.", ., value = T, invert = T)
   
-  # Remove extreme outlier
-  data.AT = subset(data.AT, rep != 141) 
+  # Read licor files
+  data_raw = lapply(all_files, read_6800)
   
-  # Do the curve fitting necessary to extract  parameters of interest
-  #pawar.params = fit.pawar(data.AT)
+  # Unpack the data
+  data_unpack = c()
+  for (i in 1:length(data_raw)) {
+    data_unpack = bind_rows(data_unpack, 
+                            data.frame(data_raw[i], curveID = i) %>% select(-averaging))
+  }
+  data_unpack$curveID = as.factor(data_unpack$curveID)
+  dat = data_unpack
+  
+  # Now I need to match up the leaves
+  dat$leafID = dat$filename %>% str_match("P[0-9]+") %>% str_extract("[0-9]+")
+  dat$method = dat$filename %>% str_match("[0-9]+R")
+  
+  # Match correct
+  dat = dat %>% match_correct()
+  
+  # Nonequilibrium correct
+  dat = dat %>% noneq_correct_full(dt1_c = 1.58, dt2_c = 1.21, aV_c = 67.26, dt1_h = 2.23, dt2_h = 2.79, aV_h = 78.55)
+  
+  # Fit SS curve to each curve
   print("Fitting curves, please wait...")
-  dat = data.AT %>% rename(Photo = A)
+  dat = dat %>% rename(Photo = A)
   dat2 = list()
   j = 1
   for (i in unique(dat$curveID)) {
@@ -46,6 +56,7 @@ make_tab1 = function(data.AT) {
     group_by(method, parameter) %>%
     summarise(mean_param = mean(value), se = sd(value)/sqrt(length(value)),na.rm=T) #%>%
   
+  
   # Fix names
   pawar.params$method[pawar.params$method == "step"] = "SEM"
   pawar.params$method[pawar.params$method == "chamber"] = "SEM-ATC"
@@ -57,12 +68,13 @@ make_tab1 = function(data.AT) {
   
   
   e_gathered = pawar.params %>%
-    select(r_tref, e, eh, topt, curveID, rep, method)
+    select(r_tref, e, eh, topt, curveID, leafID, method)
 
-  res.aov.rtref <- anova_test(data = e_gathered, dv = r_tref, wid = rep, within = method)
-  res.aov.e <- anova_test(data = e_gathered, dv = e, wid = rep, within = method)
-  res.aov.eh <- anova_test(data = e_gathered, dv = eh, wid = rep, within = method)
-  res.aov.topt <- anova_test(data = e_gathered, dv = topt, wid = rep, within = method)
+  res.aov.rtref <- anova_test(data = e_gathered, dv = r_tref, wid = leafID, within = method)
+  res.aov.e <- anova_test(data = e_gathered, dv = e, wid = leafID, within = method)
+  res.aov.eh <- anova_test(data = e_gathered, dv = eh, wid = leafID, within = method)
+  res.aov.topt <- anova_test(data = e_gathered, dv = topt, wid = leafID, within = method)
+
   # Assemble table
   
   res = e_gathered %>% group_by(method) %>% summarize(A_max = mean(r_tref),
@@ -71,15 +83,15 @@ make_tab1 = function(data.AT) {
                                                       T_opt = mean(topt))
 
   res_se = e_gathered %>% group_by(method) %>% summarize(
-                                                      A_max = sd(r_tref)/sqrt(length(r_tref)),
-                                                      E = sd(e)/sqrt(length(e)),
-                                                      E_D = sd(eh)/sqrt(length(eh)),
-                                                      T_opt = sd(topt)/sqrt(length(topt))) 
+    A_max = sd(r_tref)/sqrt(length(r_tref)),
+    E = sd(e)/sqrt(length(e)),
+    E_D = sd(eh)/sqrt(length(eh)),
+    T_opt = sd(topt)/sqrt(length(topt))) 
   
   res = res[,2:5] %>% t() %>% as.data.frame()
-  colnames(res) = c("Faster", "SEM", "SEM-ATC")
+  colnames(res) = c("1.0 C/min", "1.5 C/min", "2.0 C/min")
   res_se = res_se[,2:5] %>% t() %>% as.data.frame()
-  colnames(res_se) = c("Faster StdErr", "SEM StdErr", "SEM-ATC StdErr")
+  colnames(res_se) = c("1.0 C/min StdErr", "1.5 C/min StdErr", "2.0 C/min StdErr")
   res = merge(res, res_se, by="row.names")
   res$p = NA
   
@@ -88,21 +100,21 @@ make_tab1 = function(data.AT) {
   res$p[3] = get_anova_table(res.aov.eh)$p
   res$p[4] = get_anova_table(res.aov.topt)$p
   
-  #write.table(res, "stats.csv", sep=",", row.names = F)
   sink("stats.txt", append = T)
   cat("========\n")
-  cat("Table 1:\n")
+  cat("Table S1:\n")
   cat("========\n\n")
   
   print(res)
-
+  # Then print tukey results -  E,E_D, Topt is signficant
+  cat("\nTukey test for E:\n")
+  print(e_gathered %>% pairwise_t_test(e ~ method, paired = TRUE))
   cat("\nTukey test for E_D:\n")
-  
-  # Then print tukey results - only E_D is signficant
   print(e_gathered %>% pairwise_t_test(eh ~ method, paired = TRUE))
+  cat("\nTukey test for T_opt:\n")
+  print(e_gathered %>% pairwise_t_test(topt ~ method, paired = TRUE))
   
   cat("\n\n")
   sink()
-
   
 }
