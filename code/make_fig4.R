@@ -73,6 +73,7 @@ make_fig4 = function(data.AT) {
     theme(legend.key.size = unit(0.5, 'cm')) +
     xlab(NULL) +
     ylab(bquote(A[max]~"(µmol/m²s)")) +
+    annotate("text", x = 2, y = 9, label = "n.s.") +
     annotate("text", x = 0.75, y = max(a$mean_param+a$se)+6, label="(a)") #+
 
   # Panel 2: E_A
@@ -86,6 +87,7 @@ make_fig4 = function(data.AT) {
     theme(axis.text.x = element_blank()) +
     xlab(NULL) +
     ylab(bquote(E[A]~"(eV)")) +
+    annotate("text", x = 2, y = 1.8, label = "n.s.") +
     annotate("text", x = 0.75, y = max(a$mean_param+a$se)+.1, label="(b)") #+
 
   # Panel 3: E_D
@@ -99,6 +101,9 @@ make_fig4 = function(data.AT) {
     theme(axis.text.x = element_blank()) +
     xlab(NULL) +
     ylab(bquote(E[D]~"(eV)")) +
+    annotate("text", x = 1, y = 1.25, label = "a") +
+    annotate("text", x = 2, y = 2.05, label = "b") +
+    annotate("text", x = 3, y = 1.7, label = "ab") +
     annotate("text", x = 0.75, y = max(a$mean_param+a$se)+0.2, label="(c)") #+
 
   # Panel 4: Topt
@@ -112,6 +117,7 @@ make_fig4 = function(data.AT) {
     theme(axis.text.x = element_blank()) +
     xlab(NULL) +
     ylab(bquote(T[opt]~"(°C)")) +
+    annotate("text", x = 2, y = 21, label = "n.s.") +
     annotate("text", x = 0.75, y = max(a$mean_param+a$se)+3, label="(d)") #+
 
   svg("figures/fig4.svg",width = 3.5, height=5)
