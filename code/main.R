@@ -27,6 +27,9 @@ make_fig5(data.all) # Effects of noise and data density on parameter estimates
 make_figS1()         # Linearity of match offset accumulation
 make_figS2(data.all) # Raw data
 make_figS3(data.all) # Noise illustration
+make_figS4(data.all) # Stomatal conductance temperature response
+
+make_fig4a(data.all)
 
 make_tabS1()         # Ramp speed comparison table
 make_tabS2(data.all) # Stomatal conductance table

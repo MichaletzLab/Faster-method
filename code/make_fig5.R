@@ -224,7 +224,7 @@ make_fig5 = function(data) {
    annotate("text", x = 0.2, y = max(b$upper), label="(e)") 
   
   # Save plot to file
-  svg("figures/fig5.svg",width=4,height=6.5)
+  pdf("figures/fig5.pdf",width=4,height=6.5)
   grid.arrange(p1,p2,p3,p4,p5,
                heights = c(2,1,1),
                layout_matrix = rbind(c(1, 1),

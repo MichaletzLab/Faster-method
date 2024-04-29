@@ -108,11 +108,11 @@ make_tabS1 = function() {
   print(res)
   # Then print tukey results -  E,E_D, Topt is signficant
   cat("\nTukey test for E:\n")
-  print(e_gathered %>% pairwise_t_test(e ~ method, paired = TRUE))
+  print(e_gathered %>% pairwise_t_test(e ~ method, paired = TRUE, p.adjust.method = "none"))
   cat("\nTukey test for E_D:\n")
-  print(e_gathered %>% pairwise_t_test(eh ~ method, paired = TRUE))
+  print(e_gathered %>% pairwise_t_test(eh ~ method, paired = TRUE, p.adjust.method = "none"))
   cat("\nTukey test for T_opt:\n")
-  print(e_gathered %>% pairwise_t_test(topt ~ method, paired = TRUE))
+  print(e_gathered %>% pairwise_t_test(topt ~ method, paired = TRUE, p.adjust.method = "none"))
   
   cat("\n\n")
   sink()

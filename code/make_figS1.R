@@ -60,7 +60,7 @@ make_figS1 = function() {
     ylab(bquote("Residuals (H"[2]*"O) (µmol/mol)"))
   
   # Save plot to file
-  svg("figures/figS1.svg", width = 6,height = 5.5)
+  pdf("figures/figS1.pdf", width = 6,height = 5.5)
   grid.arrange(p1,p2,p3,p4,ncol=2)
   dev.off()  
   }

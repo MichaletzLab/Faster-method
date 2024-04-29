@@ -49,7 +49,7 @@ make_fig3 = function(data) {
   p3 = p1 + annotation_custom(grob = inset_plot_2, xmin = 17, xmax = 30, ymin = 8.5, ymax = 10.0)
   
   # Save plot to file
-  svg("figures/fig3.svg", width = 3.5, height = 3.5)
+  pdf("figures/fig3.pdf", width = 3.5, height = 3.5)
   grid.arrange(plot_grid(p3, ncol = 1, align = "v"))    
   dev.off()
 }
