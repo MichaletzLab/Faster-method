@@ -69,7 +69,7 @@ make_figS3 = function(data) {
     facet_grid(noise.level ~ type)
   
   # Save plot to file
-  svg("figures/figS3.svg", width = 4, height = 6) 
+  pdf("figures/figS3.pdf", width = 4, height = 6) 
   grid.arrange(p)
   dev.off()
 }

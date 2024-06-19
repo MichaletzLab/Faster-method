@@ -36,7 +36,7 @@ make_figS2 = function(data.AT) {
     scale_color_manual(values=pal6) +
     facet_wrap(~rep, ncol = 3)
   
-  svg("figures/figS2.svg",width = 4, height=5)
+  pdf("figures/figS2.pdf",width = 4, height=5)
   grid.arrange(p)
   dev.off()
   

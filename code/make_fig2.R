@@ -74,7 +74,7 @@ make_fig2 = function(data) {
     theme(legend.background = element_rect(fill='transparent'))
 
   # Save plot to file
-  svg('figures/fig2.svg', width = 3.5, height = 7.5)
+  pdf('figures/fig2.pdf', width = 3.5, height = 7.5)
   grid.arrange(plot_grid(p1, p2, p3, ncol = 1, align = "v"))
   dev.off()  
 }

@@ -31,7 +31,7 @@ make_fig1 = function(data) {
                        sec.axis = sec_axis(~./10+8, name = "Assimilation rate (µmol/m²s)")) 
 
   # Save plot to file
-  svg("figures/fig1.svg", width = 3, height = 2.5)
+  pdf("figures/fig1.pdf", width = 3, height = 2.5)
   grid.arrange(plot_grid(p1, ncol = 1, align = "v"))
   dev.off()
 }
